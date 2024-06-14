@@ -1,0 +1,219 @@
+
+
+projects {
+	name:string,
+	year:Number,
+	donor:User,
+	location:string,
+	budgetPkr:Number,
+	budgetEur:Number,
+	budgetUsd:Number,
+	beneficiaryCategory:Category,
+	beneficiaryStatus:String,
+	themes:[Theme],
+	objectives:[Objective],
+	activities:[Activity],
+	directBeneficiaries:[User],
+	documents:[File],
+	images:[File],
+	news:[New],
+	status:enum, //started,completed,deleted,pending,stopped
+	startDate:DateTime,
+	endDate:DateTime,
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+
+Category {
+	name:string,
+	desc:string,
+	type:string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+Theme {
+	name:string,
+	desc:string,
+	type:string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+
+Objective {
+	name:string,
+	desc:string,
+	type:string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+Activity {
+	name:string,
+	desc:string,
+	type:string,
+	project:Project,
+	startDate:DateTime,
+	MOU:string,
+	MOUSector:string,
+	region:Region, // list of regions
+	district:District,
+	duration:Number, //days 
+	participants:[User],
+	theme:Theme,
+	skillImparted:string,
+	trainers:[User],
+	endDate:DateTime,
+	report:[File],
+	images:[File],
+	mediaCoverage:string,
+	mediaLinks,string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+Region {
+	name:string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+district {
+	name:string,
+	region:Region,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+News {
+	name:string,
+	desc:string,
+	type:string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+File {
+	name:string,
+	desc:string,
+	type:string,
+	ext:string,
+	originalName:string,
+	url:string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+
+User {
+	username:string,
+	password:string,
+	fullName:string,
+	email:string,
+	type:string,
+	designation:string,
+	department:Department,
+	roles:[Role],
+	contact:Contact,
+	organization:Organization,
+	businessPhoneNo:string,
+	faxNumber:string,
+	postalAddress:string,
+	district:string,
+	province:string,
+	dob:Date,
+	placeOfBirth:string,
+	mobilePhoneNo:string,
+	empId:Number,
+	occupation:string,
+	employer:string,
+	zipCode:string,
+	cnic:File,
+	cv:File,
+	image:File,
+	documents:[File],
+	religion:enum, // Muslim,Cristian,Hindu,Sikh
+	gender:enum, // Male, Female, Transgender, other
+	status:enum, // active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+Contact {
+	Title:String,
+	firstName:String,
+	lastName:String,
+	designation:String,
+	organization:String,
+	category:String,
+	relationWithBargad:String,
+	streetAddress:String,
+	unionCouncil:String,
+	city:String,
+	province:String,
+	contact:String,
+	fax:String,
+	email:String,
+}
+
+Award {
+	name:string,
+	awardToBargad:string,
+	awardBy:string,
+	status:enum, // active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+
+}
+
+University {
+	name:string,
+	region:Region,
+	district:District,
+	status:enum, // active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+Organization {
+	name:string,
+	type:string,
+	status:enum, // active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+Role {
+	name:string,
+	permissions:[Permission],
+	status:enum, // active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+permission {
+	name:string,
+	type:string,
+	status:enum, // active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
+
+Department {
+	name:string,
+	desc:string,
+	type:string,
+	status:enum,//active,deleted
+	createdAt:DateTime,
+	updatedAt:DateTime,
+}
