@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models/user');
+const { Session } = require('../models/session');
+const { delay } = require('../utils/misc');
 const bcrypt = require('bcrypt');
 const { promisify } = require('util');
 const mongoose = require('mongoose');
@@ -62,10 +64,10 @@ async function getUsers(req, res) {
 async function signup(req, res) {
 	try {
 
-		if(!req.body.userName) 
+		if(!req.body.username) 
 			return res.status(400).json({ success: false, message : 'Invalid request' });
 
-	 	const existingUser = await User.findOne({ userName: req.body.userName }).select('_id').lean();
+	 	const existingUser = await User.findOne({ username: req.body.username }).select('_id').lean();
         
         if (existingUser) 
     		return res.status(400).json({ success: false, message : 'User already exists' });
@@ -126,17 +128,36 @@ async function resetPassword(req, res) {
 async function login(req, res) {
 	try {
 
-		if(!req.body.userName || !req.body.password) 
+		if(!req.body.username || !req.body.password) 
 			return res.status(400).json({ success: false, message : 'Invalid request' });
 
-        const user = await User.findOne({ userName:  req.body.userName }).populate('roles');
+        const user = await User.findOne({ username:  req.body.username }).populate('roles').populate('customer');
         if(user) {
 
-	        const passwordMatched = await bcryptCompare(req.body.password, user.password);
-	     	if (passwordMatched)
-	            res.status(200).json({ success: true, data : user});
-	        else 
-				return res.status(400).json({ success: false, message : 'Invalid request' });
+        	let session = await manageSession(req,user.id);
+	        if (!session || !session.session || !session.session.sessionId) {
+	          return res.status(500).send("Unable to Start session.");
+	        }
+	        else {
+		        const passwordMatched = await bcryptCompare(req.body.password, user.password);
+		     	if (passwordMatched){
+		     		const data = {
+			     		accessToken:user.accessToken,
+			            userId: user.id,
+			            sessionId:session.session.sessionId,
+			            user: {
+			              login: user.login,
+			              email: user.email,
+			              displayName: user.name,
+			              customer: user?.customer?._id,
+			              roles: user.roles,
+			            }
+		     		}
+		            res.status(200).json({ success: true, data});
+		     	}
+		        else 
+					return res.status(400).json({ success: false, message : 'Invalid request' });
+	        }
         }
         else 
 			return res.status(400).json({ success: false, message : 'Invalid request' });
@@ -146,6 +167,46 @@ async function login(req, res) {
     }
 }
 
+
+async function manageSession(req, userId) {
+
+  try {
+    await clearUserSession(userId);
+
+    // console.log("req.session",req.session);
+    if(req.session) {
+
+      req.session.cookie.expires = false;
+      let maxAge = process.env.TOKEN_EXP_TIME || "48h";
+      maxAge = maxAge.replace(/\D/g,'');
+
+      req.session.cookie.maxAge =  maxAge * 60 * 60 * 1000;
+      req.session.isLoggedIn = true;
+      req.session.user = userId;
+      req.session.sessionId = req.sessionID;
+      
+      await req.session.save();
+      await delay(500);
+      let user = await Session.findOne({"session.user":userId});
+      return user;
+    }
+    else {
+      console.log("session not found",new Date().getTime());
+
+      return false;
+    }
+
+
+  } catch (err) {
+    console.error('Error saving to session storage: ', err);
+    return next(new Error('Error creating user session'));
+  }
+}
+
+async function clearUserSession(userId) {
+  await Session.deleteMany({"session.user":userId});
+  await Session.deleteMany({"session.user":{$exists:false}});
+}
 
 async function updateUser(req, res) {
 	try {

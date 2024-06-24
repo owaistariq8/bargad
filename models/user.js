@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   type: String,
   designation: String,
   department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
+  customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
   roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
   contact: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
   organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },

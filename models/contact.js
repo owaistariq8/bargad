@@ -17,6 +17,7 @@ const contactSchema = new mongoose.Schema({
   contact:String,
   fax:String,
   email:String,
+  phone: { type: String },
   status : { 
     type: String,
     enum: ['active', 'inactive', 'deleted'],
